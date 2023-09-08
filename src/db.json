@@ -1,0 +1,40 @@
+{
+  "products": [
+    {
+      "title": "olma",
+      "selectValue": null,
+      "description": "<p>olcha</p>",
+      "cost": 78,
+      "isVisible": false,
+      "id": 3
+    },
+    {
+      "title": "smartwatch",
+      "selectValue": null,
+      "description": "<p>zo'r takoy</p>",
+      "cost": 600,
+      "isVisible": false,
+      "id": 4
+    },
+    {
+      "title": "gilos",
+      "selectValue": null,
+      "description": "<p>shirin qilos</p>",
+      "cost": 900,
+      "isVisible": false,
+      "id": 5
+    }
+  ],
+  "category": [
+    {
+      "id": 1,
+      "name": "ism",
+      "isVisible": true
+    },
+    {
+      "id": 2,
+      "name": "dadasd",
+      "isVisible": true
+    }
+  ]
+}

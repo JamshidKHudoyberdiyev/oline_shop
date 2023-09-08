@@ -20,23 +20,31 @@
   </div>
 
 
+
   <Table>
+
     <table-head>
       <table-head-cell>Nomi</table-head-cell>
-      <table-head-cell>Narxi</table-head-cell>
-      <table-head-cell>Category ID</table-head-cell>
-      <table-head-cell>O'chirish</table-head-cell>
+      <table-head-cell class="text-center">Category</table-head-cell>
+      <table-head-cell class="text-center">Narxi</table-head-cell>
+      <table-head-cell class="text-center">Ko'satish</table-head-cell>
+      <table-head-cell class="text-center">O'chirish</table-head-cell>
       <table-head-cell>Tahrirlash</table-head-cell>
     </table-head>
     <table-body>
       <!-- {{ productStore.productList }} -->
-      <table-row v-for="item in productStore.productList.products" :key="item.id">
+      <table-row v-for="item in productStore?.productList" :key="item.id">
+        <!-- {{ item }} -->
         <table-cell>{{ item.title }}</table-cell>
-        <table-cell>{{ item.rating }}</table-cell>
-        <table-cell>{{ item.category }}</table-cell>
-        <table-cell>{{ item.price }}</table-cell>
-        <table-cell><Button color="default">Tahrirlash</Button></table-cell>
-        <table-cell> <Button color="red" @click="DelProduct(item.id)">O'chirish</Button></table-cell>
+        <table-cell class="text-center">{{ item.categoryId }}</table-cell>
+        <table-cell class="text-center">{{ item.cost }}</table-cell>
+        <!-- <table-cell>{{ item.category }}</table-cell> -->
+        <table-cell class="text-center">
+          <i class="fa-regular" @click="updateVisible(item)" :class="{ 'fa-eye': item.isVisible, 'fa-eye-slash': !item.isVisible }"></i>
+          {{ item.isVisible }}
+        </table-cell>
+        <table-cell class="text-center"><Button color="default">Tahrirlash</Button></table-cell>
+        <table-cell class="text-center"> <Button color="red" @click="DelProduct(item.id)">O'chirish</Button></table-cell>
 
       </table-row>
 
@@ -48,102 +56,152 @@
       <div>Maxsulot qo'shish</div>
     </template>
     <div>
-      <Input placeholder="Maxsulot nomini kiriting" label="Maxsulot nomi"></Input>
-      <Input placeholder="Category ID" label="Category ID"></Input>
 
-
-
-      <!-- img Upload -->
-      <div>
-        <n-divider />
-        <n-upload action="https://www.mocky.io/v2/5e4bafc63100007100d8b70f" :default-file-list="fileList"
-          list-type="image-card">
-          Rasm yuklash
-        </n-upload>
-        <n-divider />
-        
-        <n-modal v-model:show="showModal" preset="card" style="width: 600px" title="A Cool Picture">
-          <img :src="previewImageUrl" style="width: 100%">
-        </n-modal>
+      <Input v-model="product.title" placeholder="Maxsulot nomini kiriting" class=" my-2 " label="Maxsulot nomi"></Input>
+      <div class="div">
+        <h3>Categoryani tanlang</h3>
+        <n-select placeholder="Select" v-model:value="product.selectValue" :options="useCategoryStore.categoryList" />
+        <!-- <Input v-model="category" placeholder="Category ID" label="Category ID" class=" my-2"></Input> -->
+        <!-- v-model:value="model.selectValue" -->
       </div>
-      <!-- img Upload -->
-
-      <a-modal :open="previewVisible" :title="previewTitle" :footer="null" @cancel="handleCancel">
-        <img alt="example" style="width: 100%" :src="previewImage" />
-      </a-modal>
-
-
-      <div>
-        <editor api-key="5htzl4ypa1oovqrr594pnwhv01yg03xfa2i95w62xy7r65dg" :init="{
+      <div class="my-2">
+        <h3>Maxsulot haqida ma'lumot kiriting</h3>
+        <editor v-model="product.description" api-key="5htzl4ypa1oovqrr594pnwhv01yg03xfa2i95w62xy7r65dg" :init="{
           menubar: false,
           plugins: 'lists link image emoticons',
           toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons'
         }" />
-
       </div>
-
-
+      <Input v-model="product.cost" type="number" placeholder="Maxsulot narxini kiriting" label="Narxi"></Input>
+      <a-modal :open="previewVisible" :title="previewTitle" :footer="null" @cancel="handleCancel">
+        <img alt="example" style="width: 100%" :src="previewImage" />
+      </a-modal>
     </div>
     <template #action>
-      <div>action</div>
+      <div class="adddelete">
+        <n-button @click="addProduct" type="primary" class=" add  rounded-md">
+          Qo'shish
+        </n-button>
+        <n-button type="primary" @click="bekorq" class=" dell rounded-md">
+          Bekor qilish
+        </n-button>
+      </div>
     </template>
   </n-modal>
 </template>
 
 <script setup>
-
-
 import { ref } from 'vue'
 import Editor from '@tinymce/tinymce-vue'
-// img uplod
-// Modal
-const showModal = ref(false)
-
-import { Table, Input, TableHead, TableBody, TableHeadCell, TableRow, TableCell, Modal,Button } from 'flowbite-vue'
+import { Table, Input, TableHead, TableBody, TableHeadCell, TableRow, TableCell, Modal, Button } from 'flowbite-vue'
 import { apiProducts } from '../../Server/apiProduct';
 import { useProductStore } from '../../Store/Product/productStore.js'
 import { onMounted } from 'vue'
+import { useCategoryStore } from '../../Store/Category/categoryStore.js'
+import { apiCategory } from '../../Server/apiCategry.js'
 
-
+const showModal = ref(false)
 
 
 const productStore = useProductStore()
 
-function getProduct() {
-  apiProducts.getProducts().then(res => productStore.setProduct(res.data))
-}
 
-function DelProduct(id) {
-  apiProducts.deleteProduct(id).then(res => res.data)
-    .catch(error => console.log(error))
-}
 
 
 onMounted(() => {
   getProduct()
+  // apiProducts.searchProduct().then(res => console.log(res.data))
 })
 
 //
 
 // nUpload
-const showModalRef = ref(false);
-// const previewImageUrlRef = ref("");
-// function handlePreview(file) {
-//   const { url } = file;
-//   previewImageUrlRef.value = url;
-//   showModalRef.value = true;
-// }
-// nUpload
+
+
+
+
+
+
+
+
+
+
+
+let product = ref({
+  title: '',
+  selectValue: null,
+  description: '',
+  cost: null,
+  isVisible: false
+})
+
+
+
+// getProduct
+
+function getProduct() {
+  apiProducts.getProducts().then(res => productStore.setProduct(res.data))
+}
+
+// deleteProuct
+
+function DelProduct(id) {
+  apiProducts.deleteProduct(id).then(() => getProduct())
+    .catch(error => console.log(error))
+}
+
+
+// addProduct
+
+function addProduct() {
+
+  const newProduct = {
+    ...product.value
+  }
+
+  apiProducts.addNewProduct(newProduct).then(() => {
+    getProduct()
+  })
+
+  showModal.value = false
+  product.value = {
+    title: '',
+    selectValue: null,
+    description: '',
+    cost: null
+  }
+
+}
+
+
+// updateVisible
+
+
+function updateVisible(item) {
+  const updateData = { ...item, isVisible: !item.isVisible }
+  console.log(updateData);
+  // console.log(updateData);
+  apiCategory.updateCategory(item.id,updateData).then(()=>getProduct())
+}
+
+
+
+
+// closeModal
+function bekorq() {
+
+  showModal.value = false
+  product.value = {
+    title: '',
+    selectValue: null,
+    description: '',
+    cost: null
+  }
+}
+
 
 
 </script>
-
-
-
-
-
-
-
 
 <style lang="scss" scoped>
 .ant-upload-select-picture-card i {
@@ -162,6 +220,21 @@ const showModalRef = ref(false);
 
 .searchADD button {
   background-color: rgb(12, 86, 23);
+}
+
+.adddelete button {
+  margin: 0 5px;
+  border: none;
+  outline: none;
+
+}
+
+.adddelete .add {
+  background-color: green;
+}
+
+.adddelete .dell {
+  background-color: red;
 }
 
 .last\:text-right:last-child {

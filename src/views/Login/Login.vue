@@ -60,11 +60,13 @@ function login() {
         const newdata = {
             ...adminData.value
         }
+        // newdata.username = 'kminchelle'
+        // newdata.password = "0lelplR" 
 
         authLogin(newdata).then(res => {
             console.log(res.data, "ddsadas")
-            // router.push({ name: "dashboard" })
-            // localStorage.setItem('token', res.data.token)
+            router.push({ name: "dashboard" })
+            localStorage.setItem('token', res.data.jwt)
 
         }).catch(error => {
             console.log(error);

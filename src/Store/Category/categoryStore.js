@@ -3,7 +3,7 @@ import { ref } from 'vue'
 
 export const useCategoryStore = defineStore('categryStore', () => {
     const categoryList = ref([])
-    const isLoading = ref(false)
+    const isLoading = ref(true)
     const errorMessage = ref('')
 
     function setCategoryList(data) {
@@ -11,7 +11,7 @@ export const useCategoryStore = defineStore('categryStore', () => {
     }
 
     function setLoading() {
-        return (isLoading.value = true)
+        return (isLoading.value = false)
     }
 
     function setErrorMessage(message) {
